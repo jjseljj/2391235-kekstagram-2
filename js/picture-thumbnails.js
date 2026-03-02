@@ -15,6 +15,7 @@ const pictureTemplate = document
 
 let renderedPhotos = [];
 
+
 const clearThumbnails = () => {
   if (!picturesContainer) {
     return;
@@ -24,21 +25,37 @@ const clearThumbnails = () => {
   pictures.forEach((picture) => picture.remove());
 };
 
+
 function onPicturesContainerClick(evt) {
   const pictureElement = evt.target.closest(PICTURE_SELECTOR);
   if (!pictureElement) {
     return;
   }
 
-  evt.preventDefault();
-
-  const index = Number(pictureElement.dataset.pictureId);
-  const photo = renderedPhotos[index];
-
+  const id = Number(pictureElement.dataset.pictureId);
+  const photo = renderedPhotos[id];
   if (!photo) {
     return;
   }
 
+  const likeElement = evt.target.closest(PICTURE_LIKES_SELECTOR);
+
+  if (likeElement) {
+    evt.preventDefault();
+
+    photo.isLiked ??= false;
+
+    photo.isLiked = !photo.isLiked;
+    photo.likes = photo.isLiked ? photo.likes + 1 : photo.likes - 1;
+
+    likeElement.textContent = String(photo.likes);
+    likeElement.classList.toggle('liked', photo.isLiked);
+    return;
+  }
+
+  evt.preventDefault();
+
+  photo._id = id;
   openBigPicture(photo);
 }
 

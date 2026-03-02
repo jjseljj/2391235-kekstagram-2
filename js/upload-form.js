@@ -35,6 +35,39 @@ const submitButtonElement = document.querySelector(SUBMIT_BUTTON_SELECTOR);
 let pristine = null;
 let isEditorInitialized = false;
 
+const PREVIEW_IMG_SELECTOR = '.img-upload__preview img';
+const EFFECTS_PREVIEW_SELECTOR = '.effects__preview';
+
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+
+const previewImgElement = document.querySelector(PREVIEW_IMG_SELECTOR);
+const effectsPreviewElements = document.querySelectorAll(EFFECTS_PREVIEW_SELECTOR);
+
+let uploadedImageUrl = null;
+
+const isValidFileType = (file) => {
+  const fileName = file.name.toLowerCase();
+  return FILE_TYPES.some((type) => fileName.endsWith(type));
+};
+
+const setPreviewImage = (file) => {
+  if (!previewImgElement) {
+    return;
+  }
+
+  if (uploadedImageUrl) {
+    URL.revokeObjectURL(uploadedImageUrl);
+  }
+
+  uploadedImageUrl = URL.createObjectURL(file);
+
+  previewImgElement.src = uploadedImageUrl;
+
+  effectsPreviewElements.forEach((preview) => {
+    preview.style.backgroundImage = `url(${uploadedImageUrl})`;
+  });
+};
+
 const isOverlayOpened = () => overlayElement && !overlayElement.classList.contains(HIDDEN_CLASS);
 
 const getHashtags = (value) => value
@@ -119,9 +152,14 @@ const initValidate = () => {
 const resetForm = () => {
   formElement.reset();
   fileInputElement.value = '';
+
   if (pristine) {
     pristine.reset();
   }
+
+  formElement.querySelectorAll('.text__error').forEach((el) => el.remove());
+  formElement.querySelectorAll('.pristine-error').forEach((el) => el.classList.remove('pristine-error'));
+  formElement.querySelectorAll('.pristine-success').forEach((el) => el.classList.remove('pristine-success'));
 };
 
 const blockSubmitButton = () => {
@@ -239,17 +277,42 @@ function closeUploadForm() {
   overlayElement.classList.add(HIDDEN_CLASS);
   document.body.classList.remove(MODAL_OPEN_CLASS);
   document.removeEventListener('keydown', onDocumentKeydown);
+  if (uploadedImageUrl) {
+    URL.revokeObjectURL(uploadedImageUrl);
+    uploadedImageUrl = null;
+  }
   resetForm();
   resetEditor();
 }
 
+const clearValidationErrors = () => {
+  if (pristine) {
+    pristine.reset();
+  }
+
+  formElement
+    .querySelectorAll('.pristine-error, .text__error')
+    .forEach((el) => el.remove());
+};
+
 const openUploadForm = () => {
+  clearValidationErrors();
+
   overlayElement.classList.remove(HIDDEN_CLASS);
   document.body.classList.add(MODAL_OPEN_CLASS);
   document.addEventListener('keydown', onDocumentKeydown);
 };
 
 const onFileInputChange = () => {
+  const file = fileInputElement.files[0];
+
+  if (!file || !isValidFileType(file)) {
+    fileInputElement.value = '';
+    return;
+  }
+
+  setPreviewImage(file);
+
   openUploadForm();
 
   if (!isEditorInitialized) {

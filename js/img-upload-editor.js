@@ -21,6 +21,14 @@ const sliderElement = overlayElement.querySelector('.effect-level__slider');
 let currentScale = SCALE_DEFAULT;
 let currentEffect = 'none';
 
+const resetEffectClass = () => {
+  previewImageElement.classList.forEach((cls) => {
+    if (cls.startsWith('effects__preview--')) {
+      previewImageElement.classList.remove(cls);
+    }
+  });
+};
+
 const applyScale = (value) => {
   currentScale = value;
   scaleValueInput.value = `${currentScale}%`;
@@ -96,7 +104,7 @@ const updateSliderForEffect = (effectName) => {
 
 const resetEffects = () => {
   currentEffect = 'none';
-  previewImageElement.className = '';
+  resetEffectClass();
   previewImageElement.style.filter = '';
   setEffectLevelVisibility('none');
 
@@ -115,7 +123,7 @@ const onEffectsChange = (evt) => {
 
   currentEffect = target.value;
 
-  previewImageElement.className = '';
+  resetEffectClass();
   previewImageElement.style.filter = '';
 
   if (currentEffect === 'none') {

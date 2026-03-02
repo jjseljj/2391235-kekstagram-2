@@ -27,8 +27,11 @@ const closeButtonElement = bigPictureElement.querySelector(CLOSE_BUTTON_SELECTOR
 const commentCountBlockElement = bigPictureElement.querySelector(COMMENT_COUNT_BLOCK_SELECTOR);
 const commentsLoaderElement = bigPictureElement.querySelector(COMMENTS_LOADER_SELECTOR);
 
+const BIG_LIKED_CLASS = 'liked';
+
 let currentComments = [];
 let renderedCommentsCount = 0;
+let currentPhoto = null;
 
 const updateCommentsCounters = () => {
   shownCommentsCountElement.textContent = String(renderedCommentsCount);
@@ -109,11 +112,20 @@ function addListeners() {
 }
 
 
-const openBigPicture = ({ url, description, likes, comments }) => {
+const openBigPicture = (photo) => {
+  currentPhoto = photo;
+
+  currentPhoto.isLiked ??= false;
+
+  const { url, description, comments } = currentPhoto;
+
   bigPictureImgElement.src = url;
   bigPictureImgElement.alt = description;
 
-  likesCountElement.textContent = String(likes);
+  likesCountElement.textContent = String(currentPhoto.likes);
+
+  likesCountElement.classList.toggle(BIG_LIKED_CLASS, currentPhoto.isLiked);
+
   captionElement.textContent = description;
 
   currentComments = comments;

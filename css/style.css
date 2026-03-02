@@ -1447,3 +1447,21 @@ main {
 .hidden {
   display: none;
 }
+
+
+.picture__likes.liked,
+.picture__likes.liked::before {
+  color: red !important;
+}
+
+.likes-count.liked,
+.likes-count.liked::before {
+  color: red !important;
+}
+.picture__likes.liked::before {
+  background-position: -5px -55px;
+}
+
+.likes-count.liked::before {
+  background-position: -5px -55px;
+}
